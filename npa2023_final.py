@@ -93,12 +93,18 @@ while True:
                 responseMessage = restconf_final.delete()
             else:
                 responseMessage = "Cannot delete: Not found interface loopback 65070165" 
-#         elif command == "enable":
-#             <!!!REPLACEME with code for enable command!!!>
-#         elif command == "disable":
-#             <!!!REPLACEME with code for disable command!!!>
-#         elif command == "status":
-#             <!!!REPLACEME with code for status command!!!>
+        elif command == "enable":
+            if interface_interact:
+                responseMessage = restconf_final.enable()
+            else:
+                responseMessage = "Cannot enable: Not found interface loopback 65070165" 
+        elif command == "disable":
+            if interface_interact:
+                responseMessage = restconf_final.disable()
+            else:
+                responseMessage = "Cannot shutdown: Not found interface loopback 65070165" 
+        elif command == "status":
+            responseMessage = restconf_final.status()
         else:
             responseMessage = "Error: No command or unknown command"
         
