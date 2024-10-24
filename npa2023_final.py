@@ -10,6 +10,7 @@ import requests
 import json
 import time
 import restconf_final
+# import netconf_final
 
 #######################################################################################
 # 2. Assign the Webex hard-coded access token to the variable accessToken.
@@ -86,25 +87,30 @@ while True:
         if command == "create":
             if interface_exists:
                 responseMessage = restconf_final.create()
+                # responseMessage = netconf_final.create()
             else:
                 responseMessage = "Cannot create: Already have interface loopback 65070165"
         elif command == "delete":
             if interface_interact:
                 responseMessage = restconf_final.delete()
+                # responseMessage = netconf_final.delete()
             else:
                 responseMessage = "Cannot delete: Not found interface loopback 65070165" 
         elif command == "enable":
             if interface_interact:
                 responseMessage = restconf_final.enable()
+                # responseMessage = netconf_final.enable()
             else:
                 responseMessage = "Cannot enable: Not found interface loopback 65070165" 
         elif command == "disable":
             if interface_interact:
                 responseMessage = restconf_final.disable()
+                # responseMessage = netconf_final.disable()
             else:
                 responseMessage = "Cannot shutdown: Not found interface loopback 65070165" 
         elif command == "status":
             responseMessage = restconf_final.status()
+            # responseMessage = netconf_final.status()
         else:
             responseMessage = "Error: No command or unknown command"
         

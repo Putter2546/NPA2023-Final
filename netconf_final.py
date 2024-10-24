@@ -2,87 +2,167 @@ from ncclient import manager
 import xmltodict
 
 m = manager.connect(
-    host="<!!!REPLACEME with router IP sddress!!!>",
-    port=<!!!REPLACEME with NETCONF Port number!!!>,
+    host="10.0.15.189",
+    port=830,
     username="admin",
     password="cisco",
     hostkey_verify=False
     )
 
-def create():
-    netconf_config = """<!!!REPLACEME with YANG data!!!>"""
 
-    try:
+def getinterface():
+    netconf_filter = """
+    <filter>
+        <interfaces-state xmlns="urn:ietf:params:xml:ns:yang:ietf-interfaces">
+            <interface>
+                <name>Loopback65070165</name>
+            </interface>
+        </interfaces-state>
+    </filter>
+    """
+    netconf_reply = m.get(filter=netconf_filter)
+    response_dict = xmltodict.parse(netconf_reply.xml)
+    interface_data = response_dict.get("rpc-reply", {}).get("data", {})
+    if interface_data:
+        return True
+    else:
+        return False
+
+def create():
+    netconf_config = """ 
+    <config>def netconf_edit_config(netconf_config):
+    return  m.<!!!REPLACEME with the proper Netconf operation!!!>(target="<!!!REPLACEME with NETCONF Datastore!!!>", config=<!!!REPLACEME with netconf_config!!!>)
+        <native xmlns="http://cisco.com/ns/yang/Cisco-IOS-XE-native">
+            <interface>
+                <Loopback>
+                    <name>Loopback65070165</name>
+                    <description>created loopback by NETCONF</description>
+                    <ip>
+                        <address>
+                            <primary>
+                                <address>172.30.165.1</address>
+                                <mask>255.255.255.0</mask>
+                            </primary>
+                        </address>
+                    </ip>
+                </Loopback>
+            </interface>
+        </native>
+    </config>
+    """
+    have = getinterface()
+    
+    if have == False:
         netconf_reply = netconf_edit_config(netconf_config)
         xml_data = netconf_reply.xml
-        print(xml_data)
         if '<ok/>' in xml_data:
-            return "<!!!REPLACEME with proper message!!!>"
-    except:
-        print("Error!")
+            return "Interface loopback 65070165 is created successfully"
+    else:
+        return "Cannot create: Interface loopback 65070165"
 
 
 def delete():
-    netconf_config = """<!!!REPLACEME with YANG data!!!>"""
+    netconf_config = """
+    <config>
+        <native xmlns="http://cisco.com/ns/yang/Cisco-IOS-XE-native">
+            <interface>
+                <Loopback operation="delete">
+                    <name>Loopback65070165</name>
+                </Loopback>
+            </interface>
+        </native>
+    </config>
+    """
 
     try:
         netconf_reply = netconf_edit_config(netconf_config)
         xml_data = netconf_reply.xml
-        print(xml_data)
         if '<ok/>' in xml_data:
-            return "<!!!REPLACEME with proper message!!!>"
+            return "Interface loopback 65070165 is deleted successfully"
     except:
-        print("Error!")
-
+        return "Cannot delete: Interface loopback 65070165"
 
 def enable():
-    netconf_config = """<!!!REPLACEME with YANG data!!!>"""
+    netconf_config = """
+    <config>
+        <native xmlns="http://cisco.com/ns/yang/Cisco-IOS-XE-native">
+            <interface>
+                <Loopback>
+                    <name>Loopback65070165</name>
+                    <description>Enabled via NETCONF</description>
+                    <shutdown operation="delete"/> 
+                </Loopback>
+            </interface>
+        </native>
+    </config>
+    """
 
-    try:
+    have = getinterface()
+    if have == False:
+        return "Cannot enable: Interface loopback 65070165"
+    else:
         netconf_reply = netconf_edit_config(netconf_config)
         xml_data = netconf_reply.xml
+        print("Response from the device:")
         print(xml_data)
         if '<ok/>' in xml_data:
-            return "<!!!REPLACEME with proper message!!!>"
-    except:
-        print("Error!")
+            return "Interface loopback 65070165 is enabled successfully"
 
 
 def disable():
-    netconf_config = """<!!!REPLACEME with YANG data!!!>"""
+     netconf_config = """
+    <config>
+        <native xmlns="http://cisco.com/ns/yang/Cisco-IOS-XE-native">
+            <interface>
+                <Loopback>
+                    <name>Loopback65070165</name>
+                    <description>Disabled via NETCONF</description>
+                    <shutdown/>
+                </Loopback>
+            </interface>
+        </native>
+    </config>
+    """
 
-    try:
+    have = getinterface()
+    if have == False:
+        return "Cannot disable: Interface loopback 65070165"
+    else:
         netconf_reply = netconf_edit_config(netconf_config)
         xml_data = netconf_reply.xml
-        print(xml_data)
         if '<ok/>' in xml_data:
-            return "<!!!REPLACEME with proper message!!!>"
-    except:
-        print("Error!")
+            return "Interface loopback 65070165 is shutdowned successfully"
 
 def netconf_edit_config(netconf_config):
-    return  m.<!!!REPLACEME with the proper Netconf operation!!!>(target="<!!!REPLACEME with NETCONF Datastore!!!>", config=<!!!REPLACEME with netconf_config!!!>)
+    return  m.edit_config(target="running", config=netconf_config)
 
 
 def status():
-    netconf_filter = """<!!!REPLACEME with YANG data!!!>"""
-
-    try:
-        # Use Netconf operational operation to get interfaces-state information
-        netconf_reply = m.<!!!REPLACEME with the proper Netconf operation!!!>(filter=<!!!REPLACEME with netconf_filter!!!>)
-        print(netconf_reply)
-        netconf_reply_dict = xmltodict.<!!!REPLACEME with the proper method!!!>(netconf_reply.xml)
-
-        # if there data return from netconf_reply_dict is not null, the operation-state of interface loopback is returned
-        if <!!!REPLACEME with the proper condition!!!>:
-            # extract admin_status and oper_status from netconf_reply_dict
-            admin_status = <!!!REPLACEME!!!>
-            oper_status = <!!!REPLACEME !!!>
-            if admin_status == 'up' and oper_status == 'up':
-                return "<!!!REPLACEME with proper message!!!>"
-            elif admin_status == 'down' and oper_status == 'down':
-                return "<!!!REPLACEME with proper message!!!>"
-        else: # no operation-state data
-            return "<!!!REPLACEME with proper message!!!>"
-    except:
-       print("Error!")
+    netconf_filter = 
+    """
+    <filter>
+        <interfaces-state xmlns="urn:ietf:params:xml:ns:yang:ietf-interfaces">
+            <interface>
+                <name>Loopback65070165</name>
+            </interface>
+        </interfaces-state>
+    </filter>
+    """
+    netconf_reply = m.get(filter=netconf_filter)
+    netconf_reply_dict = xmltodict.parse(netconf_reply.xml)
+    interface_data = netconf_reply_dict.get("rpc-reply", {}).get("data", {})
+    if(interface_data):
+        interface_data = interface_data.get("interfaces-state", {}).get("interface", {})
+        admin_status = interface_data.get("admin-status")
+        oper_status = interface_data.get("oper-status")
+        name_interface = interface_data.get("name").get("#text")
+        print(admin_status)
+        print(oper_status)
+        if (admin_status == 'up' and oper_status == 'up' and name_interface == 'Loopback65070165'):
+            return "Interface loopback 65070165 is enabled"
+        elif (admin_status == 'down' and oper_status == 'down' and name_interface == 'Loopback65070165'):
+            return "Interface loopback 65070165 is disabled"
+        elif (name_interface != 'Loopback65070165'):
+            return "No Interface loopback 65070165"
+    else:
+        return "No Interface loopback 65070165"
